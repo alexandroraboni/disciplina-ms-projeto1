@@ -95,6 +95,8 @@ public class CheckersGUI extends JFrame implements MouseListener,
 		private int tileSize, offsetX, offsetY;
 
 		private Boolean defaultTheme = true;
+		private Color tst = null;
+
 
 		public CheckersPanel() {
 			setBackground(NEUTRAL_BG_COLOR);
@@ -236,7 +238,7 @@ public class CheckersGUI extends JFrame implements MouseListener,
 							}
 						}
 
-						if (!colorSet) graphic.setColor(defaultTheme ? TILE2_COLOR : TILE3_COLOR);
+						if (!colorSet) graphic.setColor(tst != null ? tst : defaultTheme ? TILE2_COLOR : TILE3_COLOR);
 					}
 					graphic.fillRect(sqX, sqY, tileSize, tileSize);
 
@@ -967,6 +969,7 @@ public class CheckersGUI extends JFrame implements MouseListener,
 				CheckersPlayerInterface player1 = gameManager.getPlayer1();
 				CheckersPlayerInterface player2 = gameManager.getPlayer2();
 
+
 				ChangePlayerNameDialog dialog = new ChangePlayerNameDialog(
 						CheckersGUI.this, player1, player2);
 				updatePlayerLabels();
@@ -978,10 +981,25 @@ public class CheckersGUI extends JFrame implements MouseListener,
 			}
 		};
 
+
+
 		changeTheme = new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				board.defaultTheme = !board.defaultTheme;
+				boolean paused = gameManager.isPaused();
+				if (!paused)
+					gameManager.setPaused(true);
+				repaint();
+
+
+
+				ChangeTheme dialog = new ChangeTheme(
+						CheckersGUI.this, board.tst);
+				repaint();
+				dialog.dispose();
+
+				if (paused)
+					gameManager.setPaused(false);
 				repaint();
 			}
 		};
