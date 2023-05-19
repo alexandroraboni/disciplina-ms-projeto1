@@ -31,7 +31,11 @@ public class ChangeTheme extends JDialog implements ActionListener,
     private JComponent component1;
     private JButton ok, cancel;
     private JPanel panel;
-    private Color colorTheme;
+
+    // Cores disponíveis
+    public Color colorTheme;
+    private String[] colorsPt = { "Vermelho", "Preto", "Azul", "Verde", "Roxo", "Pink" };
+    private Color[] colorsEg = { Color.RED, Color.BLACK, Color.BLUE, Color.GREEN, Color.MAGENTA, Color.PINK };
 
     public ChangeTheme(JFrame parent, Color colorsTheme) {
         super(parent, "Change theme color", true);
@@ -45,8 +49,8 @@ public class ChangeTheme extends JDialog implements ActionListener,
         ListCellRenderer<? super String> cellRenderer = new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list,
-                                                          Object value, int index, boolean isSelected,
-                                                          boolean cellHasFocus) {
+                    Object value, int index, boolean isSelected,
+                    boolean cellHasFocus) {
 
                 JComponent c = (JComponent) super.getListCellRendererComponent(
                         list, value, index, isSelected, false);
@@ -78,11 +82,8 @@ public class ChangeTheme extends JDialog implements ActionListener,
         c.gridx = 0;
         c.gridy = 0;
 
-        // Cores disponíveis
-        String[] colors = {"Vermelho", "Preto", "Azul", "Verde", "Roxo", "Pink"};
-
         // ComboBox para selecionar a cor do Tema
-        comboBox1 = new SimpleComboBox(colors);
+        comboBox1 = new SimpleComboBox(colorsPt);
         comboBox1.setSelectedIndex(0); // Selecionar a cor padrão
         comboBox1.setSelectedValue("");
         comboBox1.addItemListener(this);
@@ -93,7 +94,6 @@ public class ChangeTheme extends JDialog implements ActionListener,
         comboBox1.getPopup().setBorder(CheckersGUI.BORDER);
         component1.add(comboBox1, c);
 
-
         c.gridy++;
 
         c.insets = new Insets(5, 5, 5, 5);
@@ -102,7 +102,6 @@ public class ChangeTheme extends JDialog implements ActionListener,
         c.gridx = 0;
         c.gridy = 0;
         panel.add(component1, c);
-
 
         c.gridwidth = 1;
         c.weighty = 0;
@@ -143,8 +142,6 @@ public class ChangeTheme extends JDialog implements ActionListener,
         return colorTheme;
     }
 
-
-
     public boolean isAccepted() {
         return accepted;
     }
@@ -152,8 +149,8 @@ public class ChangeTheme extends JDialog implements ActionListener,
     @Override
     public void itemStateChanged(ItemEvent e) {
         try {
-            this.colorTheme = Color.GREEN;
-
+            int index = comboBox1.getSelectedIndex();
+            this.colorTheme = colorsEg[index];
         } catch (Exception error) {
             JOptionPane.showMessageDialog(this, error, "ERROR",
                     JOptionPane.ERROR_MESSAGE);
