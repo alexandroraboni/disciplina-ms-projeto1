@@ -7,18 +7,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.ContainerEvent;
-import java.awt.event.ContainerListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
+import java.awt.event.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -208,6 +197,13 @@ public class CheckersGUI extends JFrame implements MouseListener,
 			if (selectedState == null)
 				return;
 
+			drawBoard(graphic);
+			drawLastMove(graphic);
+			drawCurrentMovePiece(graphic);
+			drawGamePausedScreen(graphic);
+		}
+
+		private void drawBoard(Graphics graphic) {
 			for (int x = 0; x < 8; x++) {
 				int sqX = offsetX + x * tileSize;
 				for (int y = 0; y < 8; y++) {
@@ -256,20 +252,21 @@ public class CheckersGUI extends JFrame implements MouseListener,
 						if (!colorSet) {
 							graphic.setColor(
 									selectedColor != null ? selectedColor : TILE3_COLOR);
-
 						}
 					}
 					graphic.fillRect(sqX, sqY, tileSize, tileSize);
 
 					if (!heldPiece) {
 						drawCheckersPiece(graphic, PLAYER1_COLOR, PLAYER2_COLOR, sqX
-								+ checkersFillOffset, sqY + checkersFillOffset,
+										+ checkersFillOffset, sqY + checkersFillOffset,
 								tileSize - checkersFillOffset * 2,
 								selectedState.board.getPiece(y, x));
 					}
 				}
 			}
+		}
 
+		private void drawLastMove(Graphics graphic) {
 			if (selectedState.lastMove != null) {
 				for (int i = 0; i < selectedState.lastMove.size(); i++) {
 					if (i == 0 || i == selectedState.lastMove.size() - 1)
@@ -286,21 +283,23 @@ public class CheckersGUI extends JFrame implements MouseListener,
 					y = offsetY + y * tileSize;
 
 					for (int j = 0; j < tileBorderSize; j++)
-						graphic.drawRect(x + j, y + j, tileSize - 2 * j, tileSize - 2
-								* j);
+						graphic.drawRect(x + j, y + j, tileSize - 2 * j, tileSize - 2 * j);
 				}
 			}
+		}
 
+		private void drawCurrentMovePiece(Graphics graphic) {
 			if (currMove != null) {
 				int index = currMove.plies.get(0).get(0);
 				int size = tileSize - checkersFillOffset * 2;
-				drawCheckersPiece(graphic, PLAYER1_ALPHA_COLOR, PLAYER2_ALPHA_COLOR,
-						offsetX + oldMouseX - size / 2, offsetY + oldMouseY
-								- size / 2,
-						size, selectedState.board
-								.getPiece(index));
-			}
 
+				drawCheckersPiece(graphic, PLAYER1_ALPHA_COLOR, PLAYER2_ALPHA_COLOR,
+						offsetX + oldMouseX - size / 2, offsetY + oldMouseY - size / 2,
+						size, selectedState.board.getPiece(index));
+			}
+		}
+
+		private void drawGamePausedScreen(Graphics graphic) {
 			if (gameManager.isPaused()) {
 				setScreenToGamePaused(graphic);
 			}
@@ -628,7 +627,6 @@ public class CheckersGUI extends JFrame implements MouseListener,
 	private JLabel player1Label;
 	private JLabel player2Label;
 
-	private DefinitionJLabelDTO definitionJLabel;
 	private JLabel plyTime;
 	private JLabel gameTime;
 	private JLabel moveCount;
@@ -831,8 +829,7 @@ public class CheckersGUI extends JFrame implements MouseListener,
 				splitPane.setDividerLocation(stateList.getWidth());
 				stateModel.clear();
 				stateList.setForeground(CheckersGUI.NEUTRAL_FG_COLOR);
-				stateList
-						.setCellRenderer(new DefaultListCellRenderer.UIResource() {
+				stateList.setCellRenderer(new DefaultListCellRenderer.UIResource() {
 
 							@Override
 							public Component getListCellRendererComponent(
@@ -928,271 +925,295 @@ public class CheckersGUI extends JFrame implements MouseListener,
 	}
 
 	private void initActions() {
-		/*
-		 * The newGame and pause actions are disabled when first pressed, and
-		 * are only re-enabled upon release of the keys.
-		 */
-		newGame = new AbstractAction() {
-			@Override
-
-			public void actionPerformed(ActionEvent e) {
-				setEnabled(false);
-				gameManager.stop();
-				if (switchPlayers) {
-					CheckersPlayerInterface player1 = gameManager.getPlayer1();
-					gameManager.setPlayer1(gameManager.getPlayer2());
-					gameManager.setPlayer2(player1);
-				}
-				gameManager.newGame();
-				showingOldPly = false;
-			}
-		};
-
-		pause = new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				setEnabled(false);
-				if (gameManager.isPaused()) {
-					gameManager.setPaused(false);
-					putValue(Action.NAME, "Pause");
-				} else if (gameManager.hasGameRunning()) {
-					gameManager.setPaused(true);
-					putValue(Action.NAME, "Unpause");
-				}
-				repaint();
-			}
-		};
-
-		quit = new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				gameManager.removeCheckersGameListener(CheckersGUI.this);
-				if (trainer == null) {
-					gameManager.stop();
-					System.exit(0);
-				} else if (gameManager.isPaused())
-					gameManager.setPaused(false);
-			}
-		};
-
-		playerSetup = new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				boolean paused = gameManager.isPaused();
-				if (!paused)
-					gameManager.setPaused(true);
-				repaint();
-				CheckersPlayerInterface player1 = gameManager.getPlayer1();
-				CheckersPlayerInterface player2 = gameManager.getPlayer2();
-				PlayerSetupDialog dialog = new PlayerSetupDialog(
-						CheckersGUI.this, player1, player2, autoSwitch);
-				if (dialog.isAccepted()) {
-					CheckersPlayerInterface newPlayer1 = dialog.getPlayer1();
-					CheckersPlayerInterface newPlayer2 = dialog.getPlayer2();
-					if (!player1.getClass().equals(newPlayer1.getClass()))
-						gameManager.setPlayer1(newPlayer1);
-					if (!player2.getClass().equals(newPlayer2.getClass()))
-						gameManager.setPlayer2(newPlayer2);
-					updatePlayerLabels();
-					switchPlayers = false;
-				}
-				dialog.dispose();
-				if (!paused)
-					gameManager.setPaused(false);
-				repaint();
-			}
-		};
-
-		changePlayersNickName = new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				boolean paused = gameManager.isPaused();
-				if (!paused)
-					gameManager.setPaused(true);
-				repaint();
-
-				CheckersPlayerInterface player1 = gameManager.getPlayer1();
-				CheckersPlayerInterface player2 = gameManager.getPlayer2();
-
-				ChangePlayerNameDialog dialog = new ChangePlayerNameDialog(
-						CheckersGUI.this, player1, player2);
-				updatePlayerLabels();
-				dialog.dispose();
-
-				if (paused)
-					gameManager.setPaused(false);
-				repaint();
-			}
-		};
-
-		changeTheme = new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				boolean paused = gameManager.isPaused();
-
-				if (!paused)
-					gameManager.setPaused(true);
-
-				repaint();
-
-				ChangeTheme dialog = new ChangeTheme(CheckersGUI.this, board.selectedColor);
-
-				board.selectedColor = dialog.colorTheme;
-
-				ConfigProperties config = new ConfigProperties();
-				int codeColor = dialog.colorTheme.getRGB();
-				config.setProp("colorTheme", String.valueOf(codeColor));
-
-				repaint();
-				dialog.dispose();
-
-				if (paused)
-					gameManager.setPaused(false);
-				repaint();
-			}
-		};
-
-		gameOptions = new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				boolean paused = gameManager.isPaused();
-				if (!paused)
-					gameManager.setPaused(true);
-				repaint();
-				GameOptionsDialog dialog = new GameOptionsDialog(
-						CheckersGUI.this, gameManager.getPlyTime() / 1000,
-						gameManager.getMaxMoves(), gameManager.getWaitTime(),
-						board.tileSize, autoSwitch, showMoves);
-				if (dialog.isAccepted()) {
-					gameManager.setPlyTime(dialog.getTurnTime() * 1000);
-					gameManager.setMaxMoves(dialog.getMaxMoves());
-					gameManager.setWaitTime(dialog.getWaitTime());
-					board.setTileSize(dialog.getTileSize());
-					autoSwitch = dialog.useAutoSwitch();
-					showMoves = dialog.showMoves();
-				}
-				dialog.dispose();
-				if (!paused)
-					gameManager.setPaused(false);
-				repaint();
-			}
-		};
-
-		createTrainer = new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				setTrainer(new CheckersTrainer(gameManager));
-				trainer.setGUI(CheckersGUI.this);
-				gameManager.stop();
-			}
-		};
-
-		help = new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				boolean paused = gameManager.isPaused();
-				if (!paused)
-					gameManager.setPaused(true);
-				repaint();
-
-				new TextDialog(CheckersGUI.this, getTitle() + " Help",
-						HELP_TEXT, true);
-
-				if (!paused)
-					gameManager.setPaused(false);
-				repaint();
-			}
-		};
-
-		changeLog = new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				boolean paused = gameManager.isPaused();
-				if (!paused)
-					gameManager.setPaused(true);
-				repaint();
-
-				new TextDialog(CheckersGUI.this, getTitle() + " Change Log",
-						CHANGE_LOG_TEXT, true);
-
-				if (!paused)
-					gameManager.setPaused(false);
-				repaint();
-			}
-		};
-
-		license = new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				boolean paused = gameManager.isPaused();
-				if (!paused)
-					gameManager.setPaused(true);
-				repaint();
-
-				new TextDialog(CheckersGUI.this, "GNU General Public License",
-						LICENSE_TEXT, false);
-
-				if (!paused)
-					gameManager.setPaused(false);
-				repaint();
-			}
-		};
-
-		about = new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				boolean paused = gameManager.isPaused();
-				if (!paused)
-					gameManager.setPaused(true);
-				repaint();
-
-				new TextDialog(CheckersGUI.this, getTitle() + " About",
-						ABOUT_TEXT, true);
-
-				if (!paused)
-					gameManager.setPaused(false);
-				repaint();
-			}
-		};
-
-		newGame.putValue(Action.NAME, "New Game");
-		pause.putValue(Action.NAME, "Pause");
-		quit.putValue(Action.NAME, "Quit");
-		playerSetup.putValue(Action.NAME, "Player Setup");
-		changePlayersNickName.putValue(Action.NAME, "Change Players NickName");
-		changeTheme.putValue(Action.NAME, "Change Theme");
-		gameOptions.putValue(Action.NAME, "Game Options");
-		createTrainer.putValue(Action.NAME, "CheckersTrainer");
-		help.putValue(Action.NAME, "Help");
-		changeLog.putValue(Action.NAME, "Change Log");
-		license.putValue(Action.NAME, "GNU General Public License");
-		about.putValue(Action.NAME, "About");
-
-		newGame.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
-				KeyEvent.VK_N, 0));
-		pause.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
-				KeyEvent.VK_P, 0));
-		quit.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
-				KeyEvent.VK_ESCAPE, 0));
-		playerSetup.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
-				KeyEvent.VK_S, 0));
-		gameOptions.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
-				KeyEvent.VK_O, 0));
-		createTrainer.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
-				KeyEvent.VK_T, 0));
-		help.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
-				KeyEvent.VK_F1, 0));
-		changeLog.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
-				KeyEvent.VK_F2, 0));
-		license.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
-				KeyEvent.VK_F11, 0));
-		about.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
-				KeyEvent.VK_F12, 0));
-		changeTheme.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
-				KeyEvent.VK_2, 0));
-		changePlayersNickName.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
-				KeyEvent.VK_C, 0));
+		newGame = createNewGameAction();
+		pause = createPauseAction();
+		quit = createQuitAction();
+		playerSetup = createPlayerSetupAction();
+		changePlayersNickName = createChangePlayersNickNameAction();
+		changeTheme = createChangeThemeAction();
+		gameOptions = createGameOptionsAction();
+		createTrainer = createCreateTrainerAction();
+		help = createHelpAction();
+		changeLog = createChangeLogAction();
+		license = createLicenseAction();
+		about = createAboutAction();
 	}
+
+	private AbstractAction createNewGameAction() {
+		return createAction("New Game", KeyEvent.VK_N, this::handleNewGame);
+	}
+
+	private AbstractAction createPauseAction() {
+		return createAction("Pause", KeyEvent.VK_P, this::handlePause);
+	}
+
+	private AbstractAction createQuitAction() {
+		return createAction("Quit", KeyEvent.VK_ESCAPE, this::handleQuit);
+	}
+
+	private AbstractAction createPlayerSetupAction() {
+		return createAction("Player Setup", KeyEvent.VK_S, this::handlePlayerSetup);
+	}
+
+	private AbstractAction createChangePlayersNickNameAction() {
+		return createAction("Change Players NickName", KeyEvent.VK_C, this::handleChangePlayersNickName);
+	}
+
+	private AbstractAction createChangeThemeAction() {
+		return createAction("Change Theme", KeyEvent.VK_2, this::handleChangeTheme);
+	}
+
+	private AbstractAction createGameOptionsAction() {
+		return createAction("Game Options", KeyEvent.VK_O, this::handleGameOptions);
+	}
+
+	private AbstractAction createCreateTrainerAction() {
+		return createAction("CheckersTrainer", KeyEvent.VK_T, this::handleCreateTrainer);
+	}
+
+	private AbstractAction createHelpAction() {
+		return createAction("Help", KeyEvent.VK_F1, this::handleHelp);
+	}
+
+	private AbstractAction createChangeLogAction() {
+		return createAction("Change Log", KeyEvent.VK_F2, this::handleChangeLog);
+	}
+
+	private AbstractAction createLicenseAction() {
+		return createAction("GNU General Public License", KeyEvent.VK_F11, this::handleLicense);
+	}
+
+	private AbstractAction createAboutAction() {
+		return createAction("About", KeyEvent.VK_F12, this::handleAbout);
+	}
+
+	private AbstractAction createAction(String name, int acceleratorKey, ActionListener listener) {
+		AbstractAction action = new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				boolean paused = gameManager.isPaused();
+				if (!paused)
+					gameManager.setPaused(true);
+				repaint();
+				listener.actionPerformed(e);
+				if (!paused)
+					gameManager.setPaused(false);
+				repaint();
+			}
+		};
+
+		action.putValue(Action.NAME, name);
+		action.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(acceleratorKey, 0));
+
+		return action;
+	}
+
+	private void handleNewGame(ActionEvent e) {
+		newGame.setEnabled(false);
+		gameManager.stop();
+
+		if (switchPlayers) {
+			CheckersPlayerInterface player1 = gameManager.getPlayer1();
+			gameManager.setPlayer1(gameManager.getPlayer2());
+			gameManager.setPlayer2(player1);
+		}
+
+		gameManager.newGame();
+		showingOldPly = false;
+	}
+
+	private void handlePause(ActionEvent e) {
+		pause.setEnabled(false);
+
+		if (gameManager.isPaused()) {
+			gameManager.setPaused(false);
+			pause.putValue(Action.NAME, "Pause");
+		} else if (gameManager.hasGameRunning()) {
+			gameManager.setPaused(true);
+			pause.putValue(Action.NAME, "Unpause");
+		}
+
+		repaint();
+	}
+
+	private void handleQuit(ActionEvent actionEvent) {
+		gameManager.removeCheckersGameListener(CheckersGUI.this);
+		if (trainer == null) {
+			gameManager.stop();
+			System.exit(0);
+		} else if (gameManager.isPaused()) {
+			gameManager.setPaused(false);
+		}
+	}
+	private void handlePlayerSetup(ActionEvent actionEvent) {
+		boolean paused = gameManager.isPaused();
+		if (!paused) {
+			gameManager.setPaused(true);
+		}
+		repaint();
+
+		CheckersPlayerInterface player1 = gameManager.getPlayer1();
+		CheckersPlayerInterface player2 = gameManager.getPlayer2();
+
+		PlayerSetupDialog dialog = new PlayerSetupDialog(CheckersGUI.this, player1, player2, autoSwitch);
+		if (dialog.isAccepted()) {
+			CheckersPlayerInterface newPlayer1 = dialog.getPlayer1();
+			CheckersPlayerInterface newPlayer2 = dialog.getPlayer2();
+			if (!player1.getClass().equals(newPlayer1.getClass())) {
+				gameManager.setPlayer1(newPlayer1);
+			}
+			if (!player2.getClass().equals(newPlayer2.getClass())) {
+				gameManager.setPlayer2(newPlayer2);
+			}
+			updatePlayerLabels();
+			switchPlayers = false;
+		}
+		dialog.dispose();
+
+		if (!paused) {
+			gameManager.setPaused(false);
+		}
+		repaint();
+	}
+
+	private void handleChangePlayersNickName(ActionEvent actionEvent) {
+		boolean paused = gameManager.isPaused();
+		if (!paused) {
+			gameManager.setPaused(true);
+		}
+		repaint();
+
+		CheckersPlayerInterface player1 = gameManager.getPlayer1();
+		CheckersPlayerInterface player2 = gameManager.getPlayer2();
+
+		ChangePlayerNameDialog dialog = new ChangePlayerNameDialog(CheckersGUI.this, player1, player2);
+		updatePlayerLabels();
+		dialog.dispose();
+
+		if (paused) {
+			gameManager.setPaused(false);
+		}
+		repaint();
+	}
+
+	private void handleChangeTheme(ActionEvent actionEvent) {
+		boolean paused = gameManager.isPaused();
+
+		if (!paused) {
+			gameManager.setPaused(true);
+		}
+
+		repaint();
+
+		ChangeTheme dialog = new ChangeTheme(CheckersGUI.this, board.selectedColor);
+		board.selectedColor = dialog.getColorTheme();
+
+		ConfigProperties config = new ConfigProperties();
+		int codeColor = dialog.getColorTheme().getRGB();
+		config.setProp("colorTheme", String.valueOf(codeColor));
+
+		repaint();
+		dialog.dispose();
+
+		if (paused) {
+			gameManager.setPaused(false);
+		}
+
+		repaint();
+	}
+
+	private void handleGameOptions(ActionEvent actionEvent) {
+		boolean paused = gameManager.isPaused();
+		if (!paused) {
+			gameManager.setPaused(true);
+		}
+
+		repaint();
+
+		GameOptionsDialog dialog = new GameOptionsDialog(
+				CheckersGUI.this,
+				gameManager.getPlyTime() / 1000,
+				gameManager.getMaxMoves(),
+				gameManager.getWaitTime(),
+				board.tileSize, autoSwitch, showMoves);
+
+
+		if (dialog.isAccepted()) {
+			gameManager.setPlyTime(dialog.getTurnTime() * 1000);
+			gameManager.setMaxMoves(dialog.getMaxMoves());
+			gameManager.setWaitTime(dialog.getWaitTime());
+			board.setTileSize(dialog.getTileSize());
+			autoSwitch = dialog.useAutoSwitch();
+			showMoves = dialog.showMoves();
+		}
+
+		dialog.dispose();
+
+		if (!paused) {
+			gameManager.setPaused(false);
+		}
+
+		repaint();
+	}
+
+	private void handleCreateTrainer(ActionEvent actionEvent) {
+		setTrainer(new CheckersTrainer(gameManager));
+		trainer.setGUI(CheckersGUI.this);
+		gameManager.stop();
+	}
+
+	private void handleHelp(ActionEvent actionEvent) {
+		boolean paused = gameManager.isPaused();
+		if (!paused)
+			gameManager.setPaused(true);
+		repaint();
+
+		new TextDialog(CheckersGUI.this, getTitle() + " Help", HELP_TEXT, true);
+
+		if (!paused)
+			gameManager.setPaused(false);
+		repaint();
+	}
+
+	private void handleChangeLog(ActionEvent actionEvent) {
+		boolean paused = gameManager.isPaused();
+		if (!paused)
+			gameManager.setPaused(true);
+		repaint();
+
+		new TextDialog(CheckersGUI.this, getTitle() + " Change Log", CHANGE_LOG_TEXT, true);
+
+		if (!paused)
+			gameManager.setPaused(false);
+		repaint();
+	}
+
+	private void handleLicense(ActionEvent actionEvent) {
+		boolean paused = gameManager.isPaused();
+		if (!paused)
+			gameManager.setPaused(true);
+		repaint();
+
+		new TextDialog(CheckersGUI.this, "GNU General Public License", LICENSE_TEXT, false);
+
+		if (!paused)
+			gameManager.setPaused(false);
+		repaint();
+	}
+
+	private void handleAbout(ActionEvent actionEvent) {
+		boolean paused = gameManager.isPaused();
+		if (!paused)
+			gameManager.setPaused(true);
+		repaint();
+
+		new TextDialog(CheckersGUI.this, getTitle() + " About", ABOUT_TEXT, true);
+
+		if (!paused)
+			gameManager.setPaused(false);
+		repaint();
+	}
+
 
 	private void initMenu() {
 		JMenu file = new JMenu("File");
@@ -1285,11 +1306,11 @@ public class CheckersGUI extends JFrame implements MouseListener,
 				&& gameManager.getCurrentPlayer() instanceof Human) {
 			int index = CheckersBoard.getIndex(oldMouseTileY, oldMouseTileX);
 
-			MainLoop: for (PossiblePly move : sortedPlies) {
+		for (PossiblePly move : sortedPlies) {
 				for (Ply moveIndices : move.plies) {
 					if (moveIndices.get(0) == index) {
 						currMove = move;
-						break MainLoop;
+						break;
 					}
 				}
 			}
@@ -1361,35 +1382,47 @@ public class CheckersGUI extends JFrame implements MouseListener,
 	 */
 	private synchronized void processPlies() {
 		sortedPlies.clear();
-		if (gameManager.getGameOutcome() == CheckersGameManager.GAME_IN_PROGRESS
-				&& (showMoves || gameManager.getCurrentPlayer() instanceof Human)) {
-			CheckersBoard board = gameManager.getBoard();
 
-			int numPlies = board.getNumPlies();
-			if (numPlies > 0) {
-				ArrayList<Ply> plies = new ArrayList<Ply>();
-				Ply firstPly = board.getPly(0);
-				if (!gameManager.isPlayer1Turn())
-					firstPly = Ply.getInvertedPly(firstPly);
-				plies.add(firstPly);
-
-				for (int i = 1; i < numPlies; i++) {
-					Ply ply = board.getPly(i);
-					if (!gameManager.isPlayer1Turn())
-						ply = Ply.getInvertedPly(ply);
-					if (ply.get(0) != firstPly.get(0)) {
-						plies.trimToSize();
-						sortedPlies.add(new PossiblePly(plies));
-						plies = new ArrayList<Ply>();
-						firstPly = ply;
-					}
-					plies.add(ply);
-				}
-				plies.trimToSize();
-				sortedPlies.add(new PossiblePly(plies));
-			}
+		if (gameManager.getGameOutcome() != CheckersGameManager.GAME_IN_PROGRESS
+				|| (!showMoves && !(gameManager.getCurrentPlayer() instanceof Human))) {
+			return;
 		}
+
+		CheckersBoard board = gameManager.getBoard();
+		int numPlies = board.getNumPlies();
+
+		if (numPlies <= 0) {
+			return;
+		}
+
+		ArrayList<Ply> plies = new ArrayList<>();
+		Ply firstPly = board.getPly(0);
+
+		if (!gameManager.isPlayer1Turn()) {
+			firstPly = Ply.getInvertedPly(firstPly);
+		}
+
+		plies.add(firstPly);
+
+		for (int i = 1; i < numPlies; i++) {
+			Ply ply = board.getPly(i);
+
+			if (!gameManager.isPlayer1Turn()) {
+				ply = Ply.getInvertedPly(ply);
+			}
+
+			if (ply.get(0) != firstPly.get(0)) {
+				sortedPlies.add(new PossiblePly(plies));
+				plies = new ArrayList<>();
+				firstPly = ply;
+			}
+
+			plies.add(ply);
+		}
+
+		sortedPlies.add(new PossiblePly(plies));
 	}
+
 
 	public void setTrainer(CheckersTrainer trainer) {
 		if (this.trainer != null || trainer == null)
