@@ -78,7 +78,7 @@ import utilsGUI.ConfigProperties;
  * terms as defined in {@link CheckersGameManager}'s javadoc. However, the GUI
  * will display "Turn" instead of "Ply", i.e. "Turn time left" instead of
  * "Ply time left".
- *
+ * 
  * @author Amos Yuen
  * @version {@value #VERISON} - 6 November 2009
  */
@@ -89,7 +89,7 @@ public class CheckersGUI extends JFrame implements MouseListener,
 		ListSelectionListener, CheckersGameListener, ContainerListener {
 	/**
 	 * A class that handles drawing and interaction with the CheckersBoard
-	 *
+	 * 
 	 * @author Amos Yuen
 	 * @version 1.20 - 25 July 2008
 	 */
@@ -139,7 +139,7 @@ public class CheckersGUI extends JFrame implements MouseListener,
 
 		/**
 		 * Draws a Checkers piece given its parameters.
-		 *
+		 * 
 		 * @param g
 		 *               the Graphics
 		 * @param color1
@@ -160,7 +160,7 @@ public class CheckersGUI extends JFrame implements MouseListener,
 		 * @return
 		 */
 		public boolean drawCheckersPiece(Graphics g, Color color1,
-										 Color color2, int x, int y, int size, byte piece) {
+				Color color2, int x, int y, int size, byte piece) {
 			if (piece == CheckersBoard.EMPTY || piece == CheckersBoard.OFFBOARD)
 				return false;
 
@@ -208,13 +208,6 @@ public class CheckersGUI extends JFrame implements MouseListener,
 			if (selectedState == null)
 				return;
 
-			drawBoard(graphic);
-			drawLastMove(graphic);
-			drawCurrentMovePiece(graphic);
-			drawGamePausedScreen(graphic);
-		}
-
-		private void drawBoard(Graphics graphic) {
 			for (int x = 0; x < 8; x++) {
 				int sqX = offsetX + x * tileSize;
 				for (int y = 0; y < 8; y++) {
@@ -263,21 +256,20 @@ public class CheckersGUI extends JFrame implements MouseListener,
 						if (!colorSet) {
 							graphic.setColor(
 									selectedColor != null ? selectedColor : TILE3_COLOR);
+
 						}
 					}
 					graphic.fillRect(sqX, sqY, tileSize, tileSize);
 
 					if (!heldPiece) {
 						drawCheckersPiece(graphic, PLAYER1_COLOR, PLAYER2_COLOR, sqX
-										+ checkersFillOffset, sqY + checkersFillOffset,
+								+ checkersFillOffset, sqY + checkersFillOffset,
 								tileSize - checkersFillOffset * 2,
 								selectedState.board.getPiece(y, x));
 					}
 				}
 			}
-		}
 
-		private void drawLastMove(Graphics graphic) {
 			if (selectedState.lastMove != null) {
 				for (int i = 0; i < selectedState.lastMove.size(); i++) {
 					if (i == 0 || i == selectedState.lastMove.size() - 1)
@@ -294,23 +286,21 @@ public class CheckersGUI extends JFrame implements MouseListener,
 					y = offsetY + y * tileSize;
 
 					for (int j = 0; j < tileBorderSize; j++)
-						graphic.drawRect(x + j, y + j, tileSize - 2 * j, tileSize - 2 * j);
+						graphic.drawRect(x + j, y + j, tileSize - 2 * j, tileSize - 2
+								* j);
 				}
 			}
-		}
 
-		private void drawCurrentMovePiece(Graphics graphic) {
 			if (currMove != null) {
 				int index = currMove.plies.get(0).get(0);
 				int size = tileSize - checkersFillOffset * 2;
-
 				drawCheckersPiece(graphic, PLAYER1_ALPHA_COLOR, PLAYER2_ALPHA_COLOR,
-						offsetX + oldMouseX - size / 2, offsetY + oldMouseY - size / 2,
-						size, selectedState.board.getPiece(index));
+						offsetX + oldMouseX - size / 2, offsetY + oldMouseY
+								- size / 2,
+						size, selectedState.board
+								.getPiece(index));
 			}
-		}
 
-		private void drawGamePausedScreen(Graphics graphic) {
 			if (gameManager.isPaused()) {
 				setScreenToGamePaused(graphic);
 			}
@@ -369,7 +359,7 @@ public class CheckersGUI extends JFrame implements MouseListener,
 	/**
 	 * A data class to hold the data for the state of the board, players, and
 	 * game for a certain ply.
-	 *
+	 * 
 	 * @author Amos Yuen
 	 * @version 1.00 - 28 July 2008
 	 */
@@ -386,7 +376,7 @@ public class CheckersGUI extends JFrame implements MouseListener,
 		}
 
 		public GameState(CheckersBoard board, Ply lastMove, int move,
-						 CheckersPlayerInterface player1, CheckersPlayerInterface player2) {
+				CheckersPlayerInterface player1, CheckersPlayerInterface player2) {
 			super();
 			this.board = board;
 			this.lastMove = lastMove;
@@ -412,7 +402,7 @@ public class CheckersGUI extends JFrame implements MouseListener,
 	/**
 	 * A wrapper class to sort the listof possible moves by the index of the
 	 * piece that is moved.
-	 *
+	 * 
 	 * @author Amos Yuen
 	 * @version 1.00 - 8 July 2008
 	 */
@@ -428,7 +418,7 @@ public class CheckersGUI extends JFrame implements MouseListener,
 	/**
 	 * A simple formatted dialog that holds a JTextArea component. Used to
 	 * display text for information purposes.
-	 *
+	 * 
 	 * @author Amos Yuen
 	 * @version 1.1 - 17 August 2008
 	 */
@@ -437,7 +427,7 @@ public class CheckersGUI extends JFrame implements MouseListener,
 		private JTextArea textArea;
 
 		public TextDialog(JFrame parent, String name, String text,
-						  boolean wordWrap) {
+				boolean wordWrap) {
 			super(parent, name, true);
 			textArea = new JTextArea(text);
 			textArea.setForeground(NEUTRAL_FG_COLOR);
@@ -476,7 +466,7 @@ public class CheckersGUI extends JFrame implements MouseListener,
 	public static final int ALPHA = 150;
 	public static final CompoundBorder BORDER = BorderFactory
 			.createCompoundBorder(BorderFactory.createBevelBorder(
-							BevelBorder.RAISED, Color.LIGHT_GRAY, Color.DARK_GRAY),
+					BevelBorder.RAISED, Color.LIGHT_GRAY, Color.DARK_GRAY),
 					BorderFactory.createBevelBorder(BevelBorder.LOWERED,
 							Color.LIGHT_GRAY, Color.DARK_GRAY));
 
@@ -496,18 +486,18 @@ public class CheckersGUI extends JFrame implements MouseListener,
 			TILE1_COLOR = new Color(240, 220, 130),
 			TILE2_COLOR = new Color(0, 130, 40),
 
-	TILE3_COLOR = new Color(21, 86, 182),
+			TILE3_COLOR = new Color(21, 86, 182),
 			NEUTRAL_FG_COLOR = new Color(150, 150, 150),
 			NEUTRAL_BG_COLOR = Color.BLACK, MOVE_ENDS_COLOR = Color.GREEN,
 			JUMP_INTERMEDIATE_COLOR = Color.CYAN,
 			OLD_MOVE_ENDS_COLOR = Color.BLUE,
 			OLD_JUMP_INTERMEDIATE_COLOR = Color.MAGENTA,
 
-	PLAYER1_COLOR = Color.RED,
+			PLAYER1_COLOR = Color.RED,
 			PLAYER2_COLOR = Color.WHITE,
 
-	PLAYER1_ALPHA_COLOR = new Color(PLAYER1_COLOR.getRed(),
-			PLAYER1_COLOR.getGreen(), PLAYER1_COLOR.getBlue(), ALPHA),
+			PLAYER1_ALPHA_COLOR = new Color(PLAYER1_COLOR.getRed(),
+					PLAYER1_COLOR.getGreen(), PLAYER1_COLOR.getBlue(), ALPHA),
 			PLAYER2_ALPHA_COLOR = new Color(PLAYER2_COLOR.getRed(),
 					PLAYER2_COLOR.getGreen(), PLAYER2_COLOR.getBlue(), ALPHA);
 
@@ -558,7 +548,7 @@ public class CheckersGUI extends JFrame implements MouseListener,
 
 	/**
 	 * Creates and formats a string to represent a KeyStroke.
-	 *
+	 * 
 	 * @param stroke the KeyStroke
 	 * @return the text displayed
 	 */
@@ -574,7 +564,7 @@ public class CheckersGUI extends JFrame implements MouseListener,
 
 	/**
 	 * Loads the Help File as a String.
-	 *
+	 * 
 	 * @return a String of the loaded Help file
 	 */
 	public static String loadTextFile(File file) {
@@ -803,7 +793,7 @@ public class CheckersGUI extends JFrame implements MouseListener,
 
 		SUB_PAUSED_TEXT = "Press '"
 				+ getKeyStrokeText((KeyStroke) pause
-				.getValue(Action.ACCELERATOR_KEY))
+						.getValue(Action.ACCELERATOR_KEY))
 				+ "' to Unpause";
 
 		String displayName = CheckersPlayerLoader.getPlayerDisplayName(0);
