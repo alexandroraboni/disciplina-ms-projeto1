@@ -17,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -78,7 +79,7 @@ public class CheckersGUI extends JFrame implements MouseListener,
 		ListSelectionListener, CheckersGameListener, ContainerListener {
 	/**
 	 * A class that handles drawing and interaction with the CheckersBoard
-	 * 
+	 *
 	 * @author Amos Yuen
 	 * @version 1.20 - 25 July 2008
 	 */
@@ -128,28 +129,21 @@ public class CheckersGUI extends JFrame implements MouseListener,
 
 		/**
 		 * Draws a Checkers piece given its parameters.
-		 * 
-		 * @param g
-		 *               the Graphics
-		 * @param color1
-		 *               Player1's color
-		 * @param color2
-		 *               Player2's color
-		 * @param x
-		 *               the x-coordinate where the left of the Checkers piece
+		 *
+		 * @param g      the Graphics
+		 * @param color1 Player1's color
+		 * @param color2 Player2's color
+		 * @param x      the x-coordinate where the left of the Checkers piece
 		 *               should be drawn
-		 * @param y
-		 *               the y-coordinate where the top of the Checkers piece
+		 * @param y      the y-coordinate where the top of the Checkers piece
 		 *               should be drawn
-		 * @param size
-		 *               the width and height the Checkers piece should be drawn in
+		 * @param size   the width and height the Checkers piece should be drawn in
 		 *               pixels
-		 * @param piece
-		 *               the Checkers piece type (King or Checker)
+		 * @param piece  the Checkers piece type (King or Checker)
 		 * @return
 		 */
 		public boolean drawCheckersPiece(Graphics g, Color color1,
-				Color color2, int x, int y, int size, byte piece) {
+										 Color color2, int x, int y, int size, byte piece) {
 			if (piece == CheckersBoard.EMPTY || piece == CheckersBoard.OFFBOARD)
 				return false;
 
@@ -358,7 +352,7 @@ public class CheckersGUI extends JFrame implements MouseListener,
 	/**
 	 * A data class to hold the data for the state of the board, players, and
 	 * game for a certain ply.
-	 * 
+	 *
 	 * @author Amos Yuen
 	 * @version 1.00 - 28 July 2008
 	 */
@@ -375,7 +369,7 @@ public class CheckersGUI extends JFrame implements MouseListener,
 		}
 
 		public GameState(CheckersBoard board, Ply lastMove, int move,
-				CheckersPlayerInterface player1, CheckersPlayerInterface player2) {
+						 CheckersPlayerInterface player1, CheckersPlayerInterface player2) {
 			super();
 			this.board = board;
 			this.lastMove = lastMove;
@@ -401,7 +395,7 @@ public class CheckersGUI extends JFrame implements MouseListener,
 	/**
 	 * A wrapper class to sort the listof possible moves by the index of the
 	 * piece that is moved.
-	 * 
+	 *
 	 * @author Amos Yuen
 	 * @version 1.00 - 8 July 2008
 	 */
@@ -417,7 +411,7 @@ public class CheckersGUI extends JFrame implements MouseListener,
 	/**
 	 * A simple formatted dialog that holds a JTextArea component. Used to
 	 * display text for information purposes.
-	 * 
+	 *
 	 * @author Amos Yuen
 	 * @version 1.1 - 17 August 2008
 	 */
@@ -426,7 +420,7 @@ public class CheckersGUI extends JFrame implements MouseListener,
 		private JTextArea textArea;
 
 		public TextDialog(JFrame parent, String name, String text,
-				boolean wordWrap) {
+						  boolean wordWrap) {
 			super(parent, name, true);
 			textArea = new JTextArea(text);
 			textArea.setForeground(NEUTRAL_FG_COLOR);
@@ -465,7 +459,7 @@ public class CheckersGUI extends JFrame implements MouseListener,
 	public static final int ALPHA = 150;
 	public static final CompoundBorder BORDER = BorderFactory
 			.createCompoundBorder(BorderFactory.createBevelBorder(
-					BevelBorder.RAISED, Color.LIGHT_GRAY, Color.DARK_GRAY),
+							BevelBorder.RAISED, Color.LIGHT_GRAY, Color.DARK_GRAY),
 					BorderFactory.createBevelBorder(BevelBorder.LOWERED,
 							Color.LIGHT_GRAY, Color.DARK_GRAY));
 
@@ -485,18 +479,18 @@ public class CheckersGUI extends JFrame implements MouseListener,
 			TILE1_COLOR = new Color(240, 220, 130),
 			TILE2_COLOR = new Color(0, 130, 40),
 
-			TILE3_COLOR = new Color(21, 86, 182),
+	TILE3_COLOR = new Color(21, 86, 182),
 			NEUTRAL_FG_COLOR = new Color(150, 150, 150),
 			NEUTRAL_BG_COLOR = Color.BLACK, MOVE_ENDS_COLOR = Color.GREEN,
 			JUMP_INTERMEDIATE_COLOR = Color.CYAN,
 			OLD_MOVE_ENDS_COLOR = Color.BLUE,
 			OLD_JUMP_INTERMEDIATE_COLOR = Color.MAGENTA,
 
-			PLAYER1_COLOR = Color.RED,
+	PLAYER1_COLOR = Color.RED,
 			PLAYER2_COLOR = Color.WHITE,
 
-			PLAYER1_ALPHA_COLOR = new Color(PLAYER1_COLOR.getRed(),
-					PLAYER1_COLOR.getGreen(), PLAYER1_COLOR.getBlue(), ALPHA),
+	PLAYER1_ALPHA_COLOR = new Color(PLAYER1_COLOR.getRed(),
+			PLAYER1_COLOR.getGreen(), PLAYER1_COLOR.getBlue(), ALPHA),
 			PLAYER2_ALPHA_COLOR = new Color(PLAYER2_COLOR.getRed(),
 					PLAYER2_COLOR.getGreen(), PLAYER2_COLOR.getBlue(), ALPHA);
 
@@ -505,6 +499,7 @@ public class CheckersGUI extends JFrame implements MouseListener,
 	public static final String PAUSED_TEXT = "PAUSED";
 	public static final long SLEEP_TIME = 250;
 	public static final String VERISON = "1.26";
+
 	static {
 		HELP_TEXT = loadTextFile(new File(HELP_FILE_PATH));
 		CHANGE_LOG_TEXT = loadTextFile(new File(CHANGE_LOG_FILE_PATH));
@@ -513,8 +508,7 @@ public class CheckersGUI extends JFrame implements MouseListener,
 	}
 
 	/**
-	 * @param time
-	 *             in milliseconds
+	 * @param time in milliseconds
 	 * @return a string representing the time in mm:ss.ms
 	 */
 	public static String formatTime(long time) {
@@ -547,7 +541,7 @@ public class CheckersGUI extends JFrame implements MouseListener,
 
 	/**
 	 * Creates and formats a string to represent a KeyStroke.
-	 * 
+	 *
 	 * @param stroke the KeyStroke
 	 * @return the text displayed
 	 */
@@ -563,7 +557,7 @@ public class CheckersGUI extends JFrame implements MouseListener,
 
 	/**
 	 * Loads the Help File as a String.
-	 * 
+	 *
 	 * @return a String of the loaded Help file
 	 */
 	public static String loadTextFile(File file) {
@@ -791,7 +785,7 @@ public class CheckersGUI extends JFrame implements MouseListener,
 
 		SUB_PAUSED_TEXT = "Press '"
 				+ getKeyStrokeText((KeyStroke) pause
-						.getValue(Action.ACCELERATOR_KEY))
+				.getValue(Action.ACCELERATOR_KEY))
 				+ "' to Unpause";
 
 		String displayName = CheckersPlayerLoader.getPlayerDisplayName(0);
@@ -831,30 +825,30 @@ public class CheckersGUI extends JFrame implements MouseListener,
 				stateList.setForeground(CheckersGUI.NEUTRAL_FG_COLOR);
 				stateList.setCellRenderer(new DefaultListCellRenderer.UIResource() {
 
-							@Override
-							public Component getListCellRendererComponent(
-									JList list, Object value, int index,
-									boolean isSelected, boolean cellHasFocus) {
-								JComponent c = (JComponent) super.getListCellRendererComponent(list,
-										value, index, isSelected,
-										cellHasFocus);
+					@Override
+					public Component getListCellRendererComponent(
+							JList list, Object value, int index,
+							boolean isSelected, boolean cellHasFocus) {
+						JComponent c = (JComponent) super.getListCellRendererComponent(list,
+								value, index, isSelected,
+								cellHasFocus);
 
-								if (!isSelected) {
-									if (index % 2 == 0)
-										c.setForeground(PLAYER1_COLOR);
-									else
-										c.setForeground(PLAYER2_COLOR);
-								} else {
-									c
-											.setBorder(CheckersGUI.LIST_SELECTION_BORDER);
-									if (index % 2 == 0)
-										c.setBackground(PLAYER1_COLOR);
-									else
-										c.setBackground(PLAYER2_COLOR);
-								}
-								return c;
-							}
-						});
+						if (!isSelected) {
+							if (index % 2 == 0)
+								c.setForeground(PLAYER1_COLOR);
+							else
+								c.setForeground(PLAYER2_COLOR);
+						} else {
+							c
+									.setBorder(CheckersGUI.LIST_SELECTION_BORDER);
+							if (index % 2 == 0)
+								c.setBackground(PLAYER1_COLOR);
+							else
+								c.setBackground(PLAYER2_COLOR);
+						}
+						return c;
+					}
+				});
 			}
 		}.start();
 	}
@@ -1045,6 +1039,7 @@ public class CheckersGUI extends JFrame implements MouseListener,
 			gameManager.setPaused(false);
 		}
 	}
+
 	private void handlePlayerSetup(ActionEvent actionEvent) {
 		boolean paused = gameManager.isPaused();
 		if (!paused) {
@@ -1306,7 +1301,7 @@ public class CheckersGUI extends JFrame implements MouseListener,
 				&& gameManager.getCurrentPlayer() instanceof Human) {
 			int index = CheckersBoard.getIndex(oldMouseTileY, oldMouseTileX);
 
-		for (PossiblePly move : sortedPlies) {
+			for (PossiblePly move : sortedPlies) {
 				for (Ply moveIndices : move.plies) {
 					if (moveIndices.get(0) == index) {
 						currMove = move;
@@ -1383,46 +1378,68 @@ public class CheckersGUI extends JFrame implements MouseListener,
 	private synchronized void processPlies() {
 		sortedPlies.clear();
 
-		if (gameManager.getGameOutcome() != CheckersGameManager.GAME_IN_PROGRESS
-				|| (!showMoves && !(gameManager.getCurrentPlayer() instanceof Human))) {
+		if (!shouldProcessPlies()) {
 			return;
 		}
 
 		CheckersBoard board = gameManager.getBoard();
+		List<Ply> plies = extractPlies(board);
+
+		splitAndAddPlies(plies);
+	}
+
+	private boolean shouldProcessPlies() {
+		if (gameManager.getGameOutcome() != CheckersGameManager.GAME_IN_PROGRESS) {
+			return false;
+		}
+
+		return showMoves || gameManager.getCurrentPlayer() instanceof Human;
+	}
+
+	private List<Ply> extractPlies(CheckersBoard board) {
 		int numPlies = board.getNumPlies();
 
 		if (numPlies <= 0) {
-			return;
+			return Collections.emptyList();
 		}
 
-		ArrayList<Ply> plies = new ArrayList<>();
-		Ply firstPly = board.getPly(0);
+		List<Ply> plies = new ArrayList<>();
 
-		if (!gameManager.isPlayer1Turn()) {
-			firstPly = Ply.getInvertedPly(firstPly);
-		}
-
-		plies.add(firstPly);
-
-		for (int i = 1; i < numPlies; i++) {
+		for (int i = 0; i < numPlies; i++) {
 			Ply ply = board.getPly(i);
 
 			if (!gameManager.isPlayer1Turn()) {
 				ply = Ply.getInvertedPly(ply);
 			}
 
-			if (ply.get(0) != firstPly.get(0)) {
-				sortedPlies.add(new PossiblePly(plies));
-				plies = new ArrayList<>();
-				firstPly = ply;
-			}
-
 			plies.add(ply);
 		}
 
-		sortedPlies.add(new PossiblePly(plies));
+		return plies;
 	}
 
+	private void splitAndAddPlies(List<Ply> plies) {
+		List<Ply> currentPlyGroup = new ArrayList<>();
+		Ply firstPly = plies.get(0);
+
+		for (Ply ply : plies) {
+			if (ply.get(0) != firstPly.get(0)) {
+				addPlyGroup(currentPlyGroup);
+				currentPlyGroup = new ArrayList<>();
+				firstPly = ply;
+			}
+
+			currentPlyGroup.add(ply);
+		}
+
+		addPlyGroup(currentPlyGroup);
+	}
+
+	private void addPlyGroup(List<Ply> plyGroup) {
+		if (!plyGroup.isEmpty()) {
+			sortedPlies.add(new PossiblePly(plyGroup));
+		}
+	}
 
 	public void setTrainer(CheckersTrainer trainer) {
 		if (this.trainer != null || trainer == null)
