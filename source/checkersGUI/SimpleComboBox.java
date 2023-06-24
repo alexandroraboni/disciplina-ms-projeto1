@@ -239,14 +239,17 @@ public class SimpleComboBox extends JComponent implements
 
 	@Override
 	public void keyReleased(KeyEvent e) {
+
 	}
 
 	@Override
 	public void keyTyped(KeyEvent e) {
+
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
+
 	}
 
 	@Override

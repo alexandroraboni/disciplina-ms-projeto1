@@ -21,10 +21,12 @@ import javax.swing.ListCellRenderer;
 import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 
+import utilsGUI.Constants;
+
 public class ChangeTheme extends JDialog implements ActionListener,
         KeyListener, ItemListener {
 
-    public static final Font FONT = new Font("Arial", Font.BOLD, 20);
+    public static final Font FONT = new Font(Constants.FONT_ARIAL, Font.BOLD, 20);
 
     private boolean accepted;
     private SimpleComboBox comboBox1;

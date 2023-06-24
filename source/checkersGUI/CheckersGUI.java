@@ -51,6 +51,7 @@ import checkersMain.CheckersBoard.Ply;
 import checkersPlayer.Human;
 import checkersSound.CheckerSound;
 import utilsGUI.Config;
+import utilsGUI.Constants;
 import utilsGUI.DefinitionJLabelDTO;
 
 /**
@@ -194,6 +195,65 @@ public class CheckersGUI extends JFrame implements MouseListener,
 			drawGamePausedScreen(graphic);
 		}
 
+		private boolean setColorMain(Graphics graphic, int x, int y, boolean heldPiece) {
+			boolean colorSet = false;
+
+			int index = CheckersBoard.getIndex(y, x);
+			if (currMove == null) {
+				colorSet = setColorCurrMove(graphic, colorSet, index);
+			} else if (currMove.plies.get(0).get(0) == index) {
+				colorSet = setColorIndex(graphic, colorSet);
+				heldPiece = true;
+			} else if (showMoves && !showingOldPly) {
+				colorSet = setColorNewPly(graphic, colorSet, index);
+			}
+
+			if (!colorSet) {
+				graphic.setColor(
+						selectedColor != null ? selectedColor : TILE3_COLOR);
+			}
+			return heldPiece;
+		}
+
+		private boolean setColorCurrMove(Graphics graphic, boolean colorSet, int index) {
+			if (showMoves && !showingOldPly) {
+				for (PossiblePly ply : sortedPlies) {
+					if (ply.plies.get(0).get(0) == index) {
+						graphic.setColor(MOVE_ENDS_COLOR);
+						colorSet = true;
+						break;
+					}
+				}
+			}
+			return colorSet;
+		}
+
+		private boolean setColorNewPly(Graphics graphic, boolean colorSet, int index) {
+			for (Ply ply : currMove.plies) {
+				if (ply.get(ply.size() - 1) == index) {
+					graphic.setColor(MOVE_ENDS_COLOR);
+					colorSet = true;
+				} else {
+					for (int i = 1; i < ply.size() - 1; i++) {
+						if (ply.get(i) == index) {
+							graphic.setColor(JUMP_INTERMEDIATE_COLOR);
+							colorSet = true;
+							break;
+						}
+					}
+				}
+			}
+			return colorSet;
+		}
+
+		private boolean setColorIndex(Graphics graphic, boolean colorSet) {
+			if (showMoves && !showingOldPly) {
+				graphic.setColor(MOVE_ENDS_COLOR);
+				colorSet = true;
+			}
+			return colorSet;
+		}
+
 		private void drawBoard(Graphics graphic) {
 			for (int x = 0; x < 8; x++) {
 				int sqX = offsetX + x * tileSize;
@@ -204,47 +264,9 @@ public class CheckersGUI extends JFrame implements MouseListener,
 					if ((x + y) % 2 == 0)
 						graphic.setColor(TILE1_COLOR);
 					else {
-						boolean colorSet = false;
-
-						int index = CheckersBoard.getIndex(y, x);
-						if (currMove == null) {
-							if (showMoves && !showingOldPly) {
-								for (PossiblePly ply : sortedPlies) {
-									if (ply.plies.get(0).get(0) == index) {
-										graphic.setColor(MOVE_ENDS_COLOR);
-										colorSet = true;
-										break;
-									}
-								}
-							}
-						} else if (currMove.plies.get(0).get(0) == index) {
-							if (showMoves && !showingOldPly) {
-								graphic.setColor(MOVE_ENDS_COLOR);
-								colorSet = true;
-							}
-							heldPiece = true;
-						} else if (showMoves && !showingOldPly) {
-							for (Ply ply : currMove.plies) {
-								if (ply.get(ply.size() - 1) == index) {
-									graphic.setColor(MOVE_ENDS_COLOR);
-									colorSet = true;
-								} else {
-									for (int i = 1; i < ply.size() - 1; i++) {
-										if (ply.get(i) == index) {
-											graphic.setColor(JUMP_INTERMEDIATE_COLOR);
-											colorSet = true;
-											break;
-										}
-									}
-								}
-							}
-						}
-
-						if (!colorSet) {
-							graphic.setColor(
-									selectedColor != null ? selectedColor : TILE3_COLOR);
-						}
+						heldPiece = setColorMain(graphic, x, y, heldPiece);
 					}
+
 					graphic.fillRect(sqX, sqY, tileSize, tileSize);
 
 					if (!heldPiece) {
@@ -322,10 +344,10 @@ public class CheckersGUI extends JFrame implements MouseListener,
 			tileBorderSize = Math.max(1, tileSize / 20);
 			checkersFillOffset = tileBorderSize;
 			checkersBorderSize = tileBorderSize;
-			kingFont = new Font("Arial", Font.BOLD, tileSize * 3 / 4);
+			kingFont = new Font(Constants.FONT_ARIAL, Font.BOLD, tileSize * 3 / 4);
 
-			pausedFont = new Font("Arial", Font.BOLD, size / 5);
-			subPausedFont = new Font("Arial", Font.BOLD, size / 20);
+			pausedFont = new Font(Constants.FONT_ARIAL, Font.BOLD, size / 5);
+			subPausedFont = new Font(Constants.FONT_ARIAL, Font.BOLD, size / 20);
 
 			Graphics g = getGraphics();
 			g.setFont(pausedFont);
@@ -851,7 +873,7 @@ public class CheckersGUI extends JFrame implements MouseListener,
 	public void componentResized(ComponentEvent e) {
 		if (e.getSource() == this) {
 			int size = Math.min(getWidth() / 10, getHeight()) / 4;
-			Font font = new Font("Arial", Font.BOLD, size);
+			Font font = new Font(Constants.FONT_ARIAL, Font.BOLD, size);
 			moveCount.setFont(font);
 			plyTime.setFont(font);
 			gameTime.setFont(font);
@@ -862,7 +884,7 @@ public class CheckersGUI extends JFrame implements MouseListener,
 			((TitledBorder) stateScrollPane.getBorder()).setTitleFont(font);
 
 			size = Math.min(getWidth() / 10, getHeight()) / 5;
-			stateList.setFont(new Font("Arial", Font.PLAIN, size));
+			stateList.setFont(new Font(Constants.FONT_ARIAL, Font.PLAIN, size));
 
 			setVisible(true);
 		}
@@ -1041,7 +1063,8 @@ public class CheckersGUI extends JFrame implements MouseListener,
 		CheckersPlayerInterface player1 = gameManager.getPlayer1();
 		CheckersPlayerInterface player2 = gameManager.getPlayer2();
 
-		PlayerSetupDialog dialog = new PlayerSetupDialog(CheckersGUI.this, player1, player2, autoSwitch);
+		PlayerSetupDialog dialog = new PlayerSetupDialog(CheckersGUI.this, player1, player2);
+
 		if (dialog.isAccepted()) {
 			CheckersPlayerInterface newPlayer1 = dialog.getPlayer1();
 			CheckersPlayerInterface newPlayer2 = dialog.getPlayer2();

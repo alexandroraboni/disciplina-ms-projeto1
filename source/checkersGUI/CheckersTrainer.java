@@ -3,6 +3,7 @@ package checkersGUI;
 import graph.Axis;
 import graph.DataSet;
 import graph.Graph2D;
+import utilsGUI.Constants;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -269,16 +270,17 @@ public class CheckersTrainer extends JFrame implements WindowListener,
 
 					String name = (String) getValueAt(rowIndex, 0);
 					Object value = getValueAt(rowIndex, colIndex);
+
 					if (realColumnIndex == 0)
 						tip = name;
 					else if (realColumnIndex == 1)
-						tip = name + " has won " + value + " game";
+						tip = name + " has won " + value + Constants.GAME;
 					else if (realColumnIndex == 2)
-						tip = name + " has drawn " + value + " game";
+						tip = name + " has drawn " + value + Constants.GAME;
 					else if (realColumnIndex == 3)
-						tip = name + " has lost " + value + " game";
+						tip = name + " has lost " + value + Constants.GAME;
 					else if (realColumnIndex == 4)
-						tip = name + " has played " + value + " game";
+						tip = name + " has played " + value + Constants.GAME;
 					else
 						return super.getToolTipText(e);
 
@@ -358,15 +360,18 @@ public class CheckersTrainer extends JFrame implements WindowListener,
 							if (index < model.getRowCount()
 									- selectedRows.length) {
 								model.moveRow(model.getRowCount()
-										- selectedRows.length, model
-										.getRowCount() - 1, index);
+										- selectedRows.length,
+										model
+												.getRowCount() - 1,
+										index);
 								table.setRowSelectionInterval(index, index
 										+ selectedRows.length - 1);
 							} else
 								table.setRowSelectionInterval(model
 										.getRowCount()
-										- selectedRows.length, model
-										.getRowCount() - 1);
+										- selectedRows.length,
+										model
+												.getRowCount() - 1);
 						} else {
 							JTable sourceTable = (JTable) source;
 							int[] indices = (int[]) data;
@@ -532,7 +537,7 @@ public class CheckersTrainer extends JFrame implements WindowListener,
 	}
 
 	private static final String[] COLUMNS = new String[] { "Name", "Wins",
-			"Draws", "Losses", "Total Games" };
+			Constants.DRAWS, Constants.LOSSES, "Total Games" };
 	private static final String[] COLUMN_TOOL_TIPS = new String[] {
 			"The name of the CheckersPlayer",
 			"The number of games the CheckersPlayer has won",
@@ -636,7 +641,8 @@ public class CheckersTrainer extends JFrame implements WindowListener,
 							.getTransferData(PlayerData.playerDataFlavor);
 					DefaultTableModel model = (DefaultTableModel) ((JTable) info
 							.getTransferable().getTransferData(
-									PlayerData.sourceFlavor)).getModel();
+									PlayerData.sourceFlavor))
+							.getModel();
 					for (int i = indices.length - 1; i >= 0; i--)
 						model.removeRow(indices[i]);
 
@@ -655,8 +661,7 @@ public class CheckersTrainer extends JFrame implements WindowListener,
 				return d1;
 			}
 		};
-		TitledBorder border = BorderFactory.createTitledBorder(BORDER,
-				"Players");
+		TitledBorder border = BorderFactory.createTitledBorder(BORDER, Constants.PLAYERS);
 		playersSP.setBorder(border);
 		playersSP.setOpaque(false);
 
@@ -691,7 +696,7 @@ public class CheckersTrainer extends JFrame implements WindowListener,
 		graphPlayersList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		graphPlayersList.addListSelectionListener(this);
 		graphSP = new JScrollPane(graphPlayersList);
-		border = BorderFactory.createTitledBorder(BORDER, "Players");
+		border = BorderFactory.createTitledBorder(BORDER, Constants.PLAYERS);
 		graphSP.setBorder(border);
 		graphSP.setOpaque(false);
 
@@ -757,7 +762,7 @@ public class CheckersTrainer extends JFrame implements WindowListener,
 		c.weighty = 1;
 		c.gridx = 0;
 		c.gridy = 0;
-		tabbedPane.addTab("Players", splitPane);
+		tabbedPane.addTab(Constants.PLAYERS, splitPane);
 		tabbedPane.addTab("Graph", graphSplitPane);
 		add(tabbedPane, c);
 
@@ -825,10 +830,8 @@ public class CheckersTrainer extends JFrame implements WindowListener,
 		int width = graph.getWidth();
 		for (int i = 0; i < wins.size(); i++) {
 			wins.get(i).legend((int) (width * WINS_X_RATIO), LEGEND_Y, "Wins");
-			draws.get(i).legend((int) (width * DRAWS_X_RATIO), LEGEND_Y,
-					"Draws");
-			losses.get(i).legend((int) (width * LOSSES_X_RATIO), LEGEND_Y,
-					"Losses");
+			draws.get(i).legend((int) (width * DRAWS_X_RATIO), LEGEND_Y, Constants.DRAWS);
+			losses.get(i).legend((int) (width * LOSSES_X_RATIO), LEGEND_Y, Constants.LOSSES);
 		}
 	}
 
@@ -878,21 +881,24 @@ public class CheckersTrainer extends JFrame implements WindowListener,
 								100.0
 										* ((Integer) group1Table.model
 												.getValueAt(group1Row, 1))
-										/ gameCount }, 1);
+										/ gameCount },
+						1);
 				draws.get(group1Row).append(
 						new double[] {
 								gameCount,
 								100.0
 										* ((Integer) group1Table.model
 												.getValueAt(group1Row, 2))
-										/ gameCount }, 1);
+										/ gameCount },
+						1);
 				losses.get(group1Row).append(
 						new double[] {
 								gameCount,
 								100.0
 										* ((Integer) group1Table.model
 												.getValueAt(group1Row, 3))
-										/ gameCount }, 1);
+										/ gameCount },
+						1);
 
 				axisY.minimum = 0;
 				axisY.maximum = 100;
@@ -1041,6 +1047,7 @@ public class CheckersTrainer extends JFrame implements WindowListener,
 				}
 
 				graphPlayersModel.addElement(group1[i].getName());
+
 				if (i < wins.size())
 					wins.get(i).deleteData();
 				else {
@@ -1057,10 +1064,8 @@ public class CheckersTrainer extends JFrame implements WindowListener,
 						int width = graph.getWidth();
 						playerWins.legend((int) (width * WINS_X_RATIO),
 								LEGEND_Y, "Wins");
-						playerDraws.legend((int) (width * DRAWS_X_RATIO),
-								LEGEND_Y, "Draws");
-						playerLosses.legend((int) (width * LOSSES_X_RATIO),
-								LEGEND_Y, "Losses");
+						playerDraws.legend((int) (width * DRAWS_X_RATIO), LEGEND_Y, Constants.DRAWS);
+						playerLosses.legend((int) (width * LOSSES_X_RATIO), LEGEND_Y, Constants.LOSSES);
 						wins.add(playerWins);
 						draws.add(playerDraws);
 						losses.add(playerLosses);

@@ -74,6 +74,7 @@ public class TextSlider extends JComponent implements ActionListener,
 	}
 
 	public void focusGained(FocusEvent e) {
+
 	}
 
 	public void focusLost(FocusEvent e) {
@@ -140,10 +141,13 @@ public class TextSlider extends JComponent implements ActionListener,
 	}
 
 	public void updateTextField() {
+
 		try {
 			textField.commitEdit();
 		} catch (ParseException e) {
+			e.printStackTrace();
 		}
+
 		Object o = textField.getValue();
 		long value;
 		if (o instanceof Integer)

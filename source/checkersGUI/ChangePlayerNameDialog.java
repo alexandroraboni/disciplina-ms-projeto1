@@ -1,6 +1,7 @@
 package checkersGUI;
 
 import checkersMain.CheckersPlayerInterface;
+import utilsGUI.Constants;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -10,16 +11,15 @@ import java.awt.event.*;
 public class ChangePlayerNameDialog extends JDialog implements ActionListener,
         KeyListener, ItemListener {
 
-    public static final Font FONT = new Font("Arial", Font.BOLD, 20);
+    public static final Font FONT = new Font(Constants.FONT_ARIAL, Font.BOLD, 20);
     private final JButton btnSaveChanges, btnCancel;
     private final JTextField changePlayerName1, changePlayerName2;
     private final CheckersPlayerInterface player1, player2;
 
     public ChangePlayerNameDialog(
-        JFrame parent,
-        CheckersPlayerInterface player1,
-        CheckersPlayerInterface player2
-    ) {
+            JFrame parent,
+            CheckersPlayerInterface player1,
+            CheckersPlayerInterface player2) {
         super(parent, "Change players nickname", true);
 
         this.player1 = player1;
@@ -29,8 +29,10 @@ public class ChangePlayerNameDialog extends JDialog implements ActionListener,
         panel.setLayout(new GridBagLayout());
         panel.setBackground(CheckersGUI.NEUTRAL_BG_COLOR);
 
-        JComponent componentChangeNamePlayer1 = new JComponent(){};
-        JComponent componentChangeNamePlayer2 = new JComponent(){};
+        JComponent componentChangeNamePlayer1 = new JComponent() {
+        };
+        JComponent componentChangeNamePlayer2 = new JComponent() {
+        };
 
         componentChangeNamePlayer1.setLayout(new GridBagLayout());
         componentChangeNamePlayer2.setLayout(new GridBagLayout());
@@ -85,29 +87,32 @@ public class ChangePlayerNameDialog extends JDialog implements ActionListener,
         setVisible(true);
     }
 
-    public void createBorders(JComponent component, String title, Color color){
+    public void createBorders(JComponent component, String title, Color color) {
         TitledBorder border = BorderFactory.createTitledBorder(
                 CheckersGUI.BORDER, title);
         border.setTitleFont(FONT);
         border.setTitleColor(color);
         component.setBorder(border);
     }
+
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == btnSaveChanges) {
+        if (e.getSource() == btnSaveChanges) {
             player1.setName(getNewNamePlayer1());
             player2.setName(getNewNamePlayer2());
         }
         setVisible(false);
     }
 
-    public String getNewNamePlayer1(){
-        if(changePlayerName1.getText().isEmpty()) return "Human";
+    public String getNewNamePlayer1() {
+        if (changePlayerName1.getText().isEmpty())
+            return "Human";
         return changePlayerName1.getText();
     }
 
-    public String getNewNamePlayer2(){
-        if(changePlayerName2.getText().isEmpty()) return "Human";
+    public String getNewNamePlayer2() {
+        if (changePlayerName2.getText().isEmpty())
+            return "Human";
         return changePlayerName2.getText();
     }
 

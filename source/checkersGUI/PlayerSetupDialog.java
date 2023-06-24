@@ -31,6 +31,7 @@ import javax.swing.border.TitledBorder;
 
 import checkersMain.CheckersPlayerInterface;
 import checkersMain.CheckersPlayerLoader;
+import utilsGUI.Constants;
 
 /**
  * This class is a GUI dialog that allows the user to change different settings
@@ -44,7 +45,7 @@ import checkersMain.CheckersPlayerLoader;
 public class PlayerSetupDialog extends JDialog implements ActionListener,
 		KeyListener, ItemListener {
 
-	public static final Font FONT = new Font("Arial", Font.BOLD, 20);
+	public static final Font FONT = new Font(Constants.FONT_ARIAL, Font.BOLD, 20);
 
 	private boolean accepted;
 	private SimpleComboBox comboBox1, comboBox2;
@@ -56,7 +57,7 @@ public class PlayerSetupDialog extends JDialog implements ActionListener,
 	private JScrollPane scrollPane1, scrollPane2;
 
 	public PlayerSetupDialog(JFrame parent, CheckersPlayerInterface player1,
-			CheckersPlayerInterface player2, boolean useAutoSwitch) {
+			CheckersPlayerInterface player2) {
 		super(parent, "Player Setup", true);
 
 		this.player1 = player1;
@@ -254,6 +255,7 @@ public class PlayerSetupDialog extends JDialog implements ActionListener,
 
 	@Override
 	public void keyReleased(KeyEvent e) {
+
 	}
 
 	@Override
